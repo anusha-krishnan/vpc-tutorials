@@ -1,16 +1,5 @@
-module "provider_vpc" {
-  source            = "../modules/vpc"
-  resource_group_id = local.resource_group_id
-  name              = "${var.basename}-provider-vpc"
-  region            = var.region
-  zones_to_cidrs = {
-    "${var.region}-1" = "10.10.200.0/24"
-  }
-  tags              = var.tags
-}
-
 resource "ibm_is_security_group_rule" "inbound_http" {
-  group     = module.provider_vpc.vpc_security_group.id
+  group     = var.vpc_security_group_id
   direction = "inbound"
   tcp {
     port_max = 80
@@ -19,7 +8,7 @@ resource "ibm_is_security_group_rule" "inbound_http" {
 }
 
 resource "ibm_is_security_group_rule" "outbound_http" {
-  group     = module.provider_vpc.vpc_security_group.id
+  group     = var.vpc_security_group_id
   direction = "outbound"
   tcp {
     port_max = 80
@@ -36,7 +25,7 @@ data "ibm_is_ssh_key" "key" {
 }
 
 resource "ibm_is_instance" "instance" {
-  for_each = { for index, subnet in module.provider_vpc.vpc_subnets : index => subnet }
+  for_each = { for index, subnet in var.vpc_subnets : index => subnet }
 
   name           = "${var.basename}-provider-vsi-${each.value.zone}"
   resource_group = local.resource_group_id
@@ -45,10 +34,10 @@ resource "ibm_is_instance" "instance" {
   primary_network_interface {
     subnet = each.value.id
     security_groups = [
-      module.provider_vpc.vpc_security_group.id
+      var.vpc_security_group_id
     ]
   }
-  vpc  = module.provider_vpc.vpc.id
+  vpc  = var.vpc_id
   zone = each.value.zone
   keys = [
     data.ibm_is_ssh_key.key.id
@@ -60,7 +49,7 @@ resource "ibm_is_instance" "instance" {
 
 resource "ibm_is_floating_ip" "ip" {
   for_each = {
-    for index, subnet in module.provider_vpc.vpc_subnets : index => ibm_is_instance.instance[index]
+    for index, subnet in var.vpc_subnets : index => ibm_is_instance.instance[index]
     if var.create_floating_ips
   }
 
@@ -94,7 +83,7 @@ module "provider_pps" {
   iaas_endpoint = local.iaas_endpoint
   iaas_endpoint_version = local.iaas_endpoint_version
   resource_group_id = local.resource_group_id
-  subnet_id = module.provider_vpc.vpc_subnets[0].id
+  subnet_id = var.subnet_id
   instance_ids = [ for instance in ibm_is_instance.instance: instance.id ]
   tags = var.tags
   endpoint = "${var.basename}.example.com"
