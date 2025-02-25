@@ -30,3 +30,14 @@ variable "instance_profile" {
   default = "cx2-2x4"
   description = "Profile used by virtual server instances."
 }
+
+variable "vpc_security_group_id" {
+  default = "r006-b7be185a-6f4e-4400-b92e-ee13414caaaa"
+  description = "VPC security group"
+}
+
+variable "vpc_id" {
+
+  default = "r006-02220c46-eeec-477a-90fa-810d13973b53"
+  description = "Existing vpc id"
+}

@@ -6,5 +6,3 @@ variable "iaas_endpoint" {}
 variable "iaas_endpoint_version" {}
 variable "subnet_id" {}
 variable "instance_ids" {}
-variable "vpc_security_group_id" {}
-variable "vpc_id" {}
