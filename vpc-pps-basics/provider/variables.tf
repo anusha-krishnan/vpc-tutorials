@@ -44,7 +44,7 @@ variable "vpc_id" {
 
 variable "vpc_subnets" {
 
-  type = list(subnet({
+  type = list(object({
     name            = string,
     id              = string,
     vpc             = string,
