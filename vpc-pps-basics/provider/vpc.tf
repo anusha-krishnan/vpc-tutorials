@@ -83,7 +83,7 @@ module "provider_pps" {
   iaas_endpoint = local.iaas_endpoint
   iaas_endpoint_version = local.iaas_endpoint_version
   resource_group_id = local.resource_group_id
-  subnet_id = var.subnet_id
+  subnet_id = var.vpc_subnets[0].id
   instance_ids = [ for instance in ibm_is_instance.instance: instance.id ]
   tags = var.tags
   endpoint = "${var.basename}.example.com"
