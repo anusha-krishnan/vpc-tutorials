@@ -43,6 +43,14 @@ variable "vpc_id" {
 }
 
 variable "vpc_subnets" {
-  default = ["0717-05808721-bdb4-4fe1-be7f-ed0aa50cbdcb"]
+
+  type = list(subnet({
+    name            = string,
+    id              = string,
+    vpc             = string,
+    zone            = "string
+  }))
+
+  default = [{name="vpc-pps-provider-vpc-us-south-1", id="0717-05808721-bdb4-4fe1-be7f-ed0aa50cbdcb", vpc="r006-02220c46-eeec-477a-90fa-810d13973b53", zone="us-south-1"}]
   description = "Existing subnet id"
 }
