@@ -42,7 +42,7 @@ variable "vpc_id" {
   description = "Existing vpc id"
 }
 
-variable "subnet_id" {
-  default = "0717-05808721-bdb4-4fe1-be7f-ed0aa50cbdcb"
+variable "vpc_subnets" {
+  default = ["0717-05808721-bdb4-4fe1-be7f-ed0aa50cbdcb"]
   description = "Existing subnet id"
 }
