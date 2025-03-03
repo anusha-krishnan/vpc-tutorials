@@ -26,18 +26,18 @@ data "ibm_is_ssh_key" "key" {
 
 resource "ibm_is_instance" "instance" {
 
-  name           = "${var.basename}-provider-vsi-${ibm_is_subnet.vpc_subnet.zone}"
+  name           = "${var.basename}-provider-vsi-${data.ibm_is_subnet.vpc_subnet.zone}"
   resource_group = local.resource_group_id
   image          = data.ibm_is_image.image.id
   profile        = var.instance_profile
   primary_network_interface {
-    subnet = ibm_is_subnet.vpc_subnet.id
+    subnet = data.ibm_is_subnet.vpc_subnet.id
     security_groups = [
       var.vpc_security_group_id
     ]
   }
   vpc  = var.vpc_id
-  zone = ibm_is_subnet.vpc_subnet.zone
+  zone = data.ibm_is_subnet.vpc_subnet.zone
   keys = [
     data.ibm_is_ssh_key.key.id
   ]
@@ -48,8 +48,8 @@ resource "ibm_is_instance" "instance" {
 
 resource "ibm_is_floating_ip" "ip" {
   count          = var.create_floating_ips ? 1 : 0
-  name   = "${ibm_is_subnet.vpc_subnet.name}-ip"
-  target = ibm_is_subnet.vpc_subnet.primary_network_interface[0].id
+  name   = "${data.ibm_is_subnet.vpc_subnet.name}-ip"
+  target = data.ibm_is_subnet.vpc_subnet.primary_network_interface[0].id
   resource_group = local.resource_group_id
 }
 
