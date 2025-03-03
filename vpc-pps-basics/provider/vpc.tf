@@ -48,8 +48,8 @@ resource "ibm_is_instance" "instance" {
 
 resource "ibm_is_floating_ip" "ip" {
   count          = var.create_floating_ips ? 1 : 0
-  name   = "${data.ibm_is_subnet.vpc_subnet.name}-ip"
-  target = data.ibm_is_subnet.vpc_subnet.primary_network_interface[0].id
+  name   = "${ibm_is_instance.instance.name}-ip"
+  target = ibm_is_instance.instance.primary_network_interface[0].id
   resource_group = local.resource_group_id
 }
 
