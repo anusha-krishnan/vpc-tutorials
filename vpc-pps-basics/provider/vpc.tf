@@ -25,20 +25,19 @@ data "ibm_is_ssh_key" "key" {
 }
 
 resource "ibm_is_instance" "instance" {
-  for_each = { for index, subnet in var.vpc_subnets : index => subnet }
 
-  name           = "${var.basename}-provider-vsi-${each.value.zone}"
+  name           = "${var.basename}-provider-vsi-${ibm_is_subnet.vpc_subnet.zone}"
   resource_group = local.resource_group_id
   image          = data.ibm_is_image.image.id
   profile        = var.instance_profile
   primary_network_interface {
-    subnet = each.value.id
+    subnet = ibm_is_subnet.vpc_subnet.id
     security_groups = [
       var.vpc_security_group_id
     ]
   }
   vpc  = var.vpc_id
-  zone = each.value.zone
+  zone = ibm_is_subnet.vpc_subnet.zone
   keys = [
     data.ibm_is_ssh_key.key.id
   ]
@@ -48,13 +47,9 @@ resource "ibm_is_instance" "instance" {
 }
 
 resource "ibm_is_floating_ip" "ip" {
-  for_each = {
-    for index, subnet in var.vpc_subnets : index => ibm_is_instance.instance[index]
-    if var.create_floating_ips
-  }
-
-  name   = "${each.value.name}-ip"
-  target = each.value.primary_network_interface[0].id
+  count          = var.create_floating_ips ? 1 : 0
+  name   = "${ibm_is_subnet.vpc_subnet.name}-ip"
+  target = ibm_is_subnet.vpc_subnet.primary_network_interface[0].id
   resource_group = local.resource_group_id
 }
 
@@ -65,6 +60,9 @@ output "connect_to_instance" {
 }
 
 data "ibm_iam_auth_token" "tokendata" {}
+
+data "ibm_is_subnet" "vpc_subnet" {
+	identifier = var.subnet_id
 
 provider "restapi" {
   alias = "pps"
@@ -83,7 +81,7 @@ module "provider_pps" {
   iaas_endpoint = local.iaas_endpoint
   iaas_endpoint_version = local.iaas_endpoint_version
   resource_group_id = local.resource_group_id
-  subnet_id = var.vpc_subnets[0].id
+  subnet_id = var.subnet_id
   instance_ids = [ for instance in ibm_is_instance.instance: instance.id ]
   tags = var.tags
   endpoint = "${var.basename}.example.com"
