@@ -37,13 +37,11 @@ variable "vpc_security_group_id" {
 }
 
 variable "vpc_id" {
-
   default = "r006-02220c46-eeec-477a-90fa-810d13973b53"
   description = "Existing vpc id"
 }
 
 variable "subnet_id" {
-
   default = "0717-05808721-bdb4-4fe1-be7f-ed0aa50cbdcb"
   description = "Existing subnet id"
 }

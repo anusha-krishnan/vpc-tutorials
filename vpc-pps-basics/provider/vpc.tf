@@ -63,6 +63,7 @@ data "ibm_iam_auth_token" "tokendata" {}
 
 data "ibm_is_subnet" "vpc_subnet" {
 	identifier = var.subnet_id
+}
 
 provider "restapi" {
   alias = "pps"
